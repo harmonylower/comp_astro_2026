@@ -1,20 +1,15 @@
-FC=gfortran
-FFLAGS=-c
-SRC=say_hello.f90 learning.f90
-OBJ=$(SRC:.f90=.o)
+FC = gfortran
+FFLAGS = -O3 -Wextra -fdefault-real-8 -finit-real=nan
+SRC = say_hello.f90 write_output.f90 setup.f90 density.f90 boundary.f90 SPH.f90 
+OBJ = $(SRC:.f90=.o)
+
 
 %.o: %.f90
-	$(FC) $(FFLAGS) $<	-o $@
+	$(FC) $(FFLAGS)	-o $@ -c $<
 
-test: say_hello
-	$(FC) -o $@ learning.f90 say_hello.o
-
-say_hello:
-	$(FC) $(FFLAGS) say_hello.f90
-
-
+sph: ${OBJ}
+	$(FC) $(FFLAGS) -o $@ ${OBJ}
 
 clean:
 	rm -f *.o *.mod test
 
-.PHONY: say_hello

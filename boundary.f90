@@ -1,7 +1,7 @@
 module boundary
-    USE init, ONLY: xmax, xmin
+    use setup, only: xmax, xmin
 
-CONTAINS
+contains
     subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts)
         real, dimension(:), intent(inout) :: x, vel, mass, h, rho, u, pre
         integer, intent(in) :: n
@@ -14,13 +14,11 @@ CONTAINS
         dx = xmax-xmin
         n_ghosts = 0
 
-        
-
         do i=1,n
             !if 2 smothing lengths away is greater than the maximum xvalue 
             !then it must be include in the calculations for the particles with smaller x
             !so set a ghost particle with properties of the large x particle but a position before the low x particles
-            if (x(i) + 2.0*h(i) > xmax) then  
+            if (x(i) + 2.0*h(i) > xmax) then  !the two is a parameter from the kernal, R kern = 2 for cubic spline 
                 n_ghosts = n_ghosts + 1
                 x(n+n_ghosts) = x(i) - dx !dx is total length not spacing
                 vel(n+n_ghosts) = vel(i)
@@ -46,4 +44,3 @@ CONTAINS
     end subroutine set_ghosts
 end module boundary
 
-!if dx=1 are we not setting it at the exact same distance??

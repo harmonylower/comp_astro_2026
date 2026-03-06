@@ -1,32 +1,41 @@
 program SPH
     use hello, only:say
-    use init, only:setup
+    use setup, only:init
     use write_output, only:output
-    use get_density, only:get_den
+    use calcs, only:get_den
     use boundary, only:set_ghosts
+    use leapfrog, only:get_derivs, step
 
     implicit none
-    integer, parameter :: nmax=140
-    real, dimension(nmax):: x, vel, mass, h, rho, u, pre, cs
+    integer, parameter :: nmax=250
+    real, dimension(nmax):: x, vel, mass, h, rho, u, pre, cs, acc
     integer :: n, n_ghost
-    real :: time
+    real :: time, dt, tprint
+
+    real, parameter :: dtout = 0.05, tmax = 5
 
     time=0.0
+
+    !Inital calcuting and output
     call say()
-    call setup(nmax, x, vel, mass, h, rho, pre, u, cs, n)
-    
+    call init(nmax, x, vel, mass, h, rho, pre, u, cs, n)
     call set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghost)
-
-    call get_den(n, n_ghost, x, mass, h, rho)
-
-
+    call get_derivs(n, n_ghost, x, mass, h, rho, pre, cs, acc, vel, u)
     call output(time, x, vel, mass, h, rho, u, pre, n)
+
+    dt = 0.5*h(1)/cs(1)
+    print*, 'dt', dt
+    tprint = dtout
+    do while (time < tmax)
+        call step(x, vel, acc, mass, h, rho, pre, cs, dt, n, n_ghost, nmax, u)
+        call set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghost)
+        time = time + dt
+        if (time > tprint) then
+            call output(time, x, vel, mass, h, rho, u, pre, n)
+            tprint = tprint + dtout
+        end if
+    end do
+
 end program SPH
 
-!parameter from the kernal, R kern = 2 for cubic spline hence 2*smoothing length is criteria
-!split kernal and density into two seperate so that v and u can be used in same module as density
-!use functinos
-!get rid of kind 8 and d0 on numbers
-!consider where sound speed is coming from when putting in module
-!no shouting :(
-!kernal out
+

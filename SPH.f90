@@ -22,8 +22,8 @@ program SPH
     call set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghost)
     call get_derivs(n, n_ghost, x, mass, h, rho, pre, cs, acc, vel, u)
     call output(time, x, vel, mass, h, rho, u, pre, n)
-
-    dt = 0.5*h(1)/cs(1)
+    !dt = 0.5*h(1)/cs(1)
+    dt=0.001
     print*, 'dt', dt
     tprint = dtout
     do while (time < tmax)

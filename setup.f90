@@ -1,6 +1,8 @@
 module setup
     use eos, only: iso_eos
-    real, parameter :: xmax=1.0, xmin=0.0,  rho0=1.0
+    real, parameter :: xmax=1.0, xmin=0.0,  rho0=1.0 !SOMEWHERE ELSE USES
+    real, parameter :: hfac = 1.2 ! get_h uses
+
     
     
 contains
@@ -13,15 +15,14 @@ contains
         integer :: i
 
         dx = (xmax-xmin)/100.0 !ENSURE CHANGE LATER
-
         n = INT((xmax-xmin) / dx)
 
         do i=1,n
             cs(i)=1.0 !ENSURE CHANGED LATTER
             x(i) = xmin + real(i)*dx
-            vel(i) = 1.0-4 * cs(i) * SIN((2.0*PI)/(xmax-xmin) * (x(i)-xmin))
+            vel(i) = 1.0E-4 * cs(i) * sin((2.0*PI)/(xmax-xmin) * (x(i)-xmin))
             mass(i) = rho0 * dx 
-            h(i) = 1.2 * dx
+            h(i) = hfac * dx
             pre(i) = rho0 * cs(i)**2
         end do
 

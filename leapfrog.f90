@@ -26,10 +26,9 @@ contains
         integer, intent(inout) :: n_ghost
         real, dimension(nmax) :: a0, v_half
         a0 = a
-        x = x + dt*v +0.5 *dt**2 * a0
+        x = x + dt*v + 0.5 * dt**2 * a0
         v_half = v + dt*a0
-        call get_derivs(n, n_ghost, x, m, h, rho, pre, cs, a0, v_half, u)
-
+        call get_derivs(n, n_ghost, x, m, h, rho, pre, cs, a, v_half, u)
         v = v_half + 0.5*dt* (a - a0)
     end subroutine step
     

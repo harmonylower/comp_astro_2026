@@ -17,7 +17,7 @@ contains
         write(filename,"(a,i5.5,a)") 'output_',nfile,'.txt'
         open(newunit=lu, file=filename, status='replace', action='write')
         
-        write(lu,*) '# x, vel, mass, smoothing length, density, internal energy, pressure, sound speed'
+        write(lu,*) '# x, v, m, h, density, internal energy, pressure, sound speed'
         write(lu,*) time
         do i=1,n
             write(lu,*) x(i), vel(i), mass(i), h(i), rho(i), u(i), pre(i)

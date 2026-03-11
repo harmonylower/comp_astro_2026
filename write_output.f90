@@ -3,10 +3,10 @@ module write_output
     integer :: nfile = -1
     
 contains
-    subroutine output(time, x, vel, mass, h, rho, u, pre, n)
+    subroutine output(time, x, v, a, m, h, rho, u, pre, n)
         implicit none
         integer, intent(in) :: n
-        real, dimension(:), intent(in) :: x, vel, mass, h, rho, pre, u
+        real, dimension(:), intent(in) :: x, v, a, m, h, rho, pre, u
         real, intent(in) :: time
         
         integer :: i, lu
@@ -17,12 +17,12 @@ contains
         write(filename,"(a,i5.5,a)") 'output_',nfile,'.txt'
         open(newunit=lu, file=filename, status='replace', action='write')
         
-        write(lu,*) '# x, v, m, h, density, internal energy, pressure, sound speed'
+        write(lu,*) '# x, v, a,m, h, density, ke, pressure, sound speed'
         write(lu,*) time
         do i=1,n
-            write(lu,*) x(i), vel(i), mass(i), h(i), rho(i), u(i), pre(i)
+            write(lu,*) x(i), v(i), a(i), m(i), h(i), rho(i), u(i), pre(i)
         enddo
-
+        write(lu,*) sum(u(1:n))
         close(lu)
     end subroutine output
 

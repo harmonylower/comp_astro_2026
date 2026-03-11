@@ -2,8 +2,8 @@ module boundary
     use setup, only: xmax, xmin
 
 contains
-    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts)
-        real, dimension(:), intent(inout) :: x, vel, mass, h, rho, u, pre
+    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs)
+        real, dimension(:), intent(inout) :: x, vel, mass, h, rho, u, pre, cs
         integer, intent(in) :: n
         integer, intent(out) :: n_ghosts
         real :: dx
@@ -27,6 +27,7 @@ contains
                 rho(n+n_ghosts) = rho(i)
                 u(n+n_ghosts) = u(i)
                 pre(n+n_ghosts) = pre(i)
+                cs(n+n_ghosts) = cs(i)
 
             elseif (x(i) - 2.0*h(i) < xmin) then
                 n_ghosts = n_ghosts + 1
@@ -37,10 +38,10 @@ contains
                 rho(n+n_ghosts) = rho(i)
                 u(n+n_ghosts) = u(i)
                 pre(n+n_ghosts) = pre(i)
+                cs(n+n_ghosts) = cs(i)
             end if
 
         end do
-
     end subroutine set_ghosts
 end module boundary
 

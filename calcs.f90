@@ -22,30 +22,48 @@ contains
 
     end subroutine get_den
 
-    subroutine get_accel(n, n_ghost, x, m, h, rho, pre, a)
+    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs)
         integer, intent(in) :: n, n_ghost
-        real, dimension(:), intent(in) :: x, m, h, rho, pre
+        real, dimension(:), intent(in) :: x, m, h, rho, pre, v, cs
         real, dimension(:), intent(inout) :: a
 
-        real :: dist, q_i, q_j, w_i, w_j, lft, rgt
+        real :: dist, q_i, q_j, w_i, w_j, LHS, RHS, vsign_i, vsign_j, xsign, qab_i, qab_j
         integer :: i, j
-        real, dimension(n+n_ghost*3) :: q_ab
-        real, parameter :: sigma = 2.0/3.0
-        q_ab(1:n+n_ghost) = 0.0
+        real, parameter :: sigma = 2.0/3.0, alpha = 1.0, beta = 2.0
 
         a(1:n) = 0.0 
         do i=1, n
             do j=1, n+n_ghost
-                if (i==j) cycle !skip itself
+                if (i==j) cycle !skip itself (one less set of calculations)
+
                 dist = abs(x(i)-x(j))
+                xsign = sign(1.0, x(i)-x(j))
+                !LHS
                 q_i = dist/h(i)
-                q_j = dist/h(j)
                 call grad_cubic_spline(q_i, w_i)
+                vsign_i = alpha*cs(i) - beta*(v(i)-v(j))*xsign !sign as in 1D so unit vector is scalar
+                if ( (v(i)-v(j))*xsign < 0.0 ) then
+                    qab_i = -0.5 * rho(i)*vsign_i * (v(i)-v(j)) * xsign
+                else 
+                    qab_i = 0
+                end if
+                LHS = (pre(i) + qab_i) / rho(i)**2  * sigma/h(i)**2 * w_i * xsign
+
+                !RHS
+                q_j = dist/h(j)
                 call grad_cubic_spline(q_j, w_j)
                 
-                lft = (pre(i) + q_ab(i)) / rho(i)**2  * sigma/h(i)**2 * w_i * sign(1.0,x(i)-x(j))
-                rgt = (pre(j) + q_ab(j)) / rho(j)**2  * sigma/h(j)**2 * w_j * sign(1.0,x(i)-x(j))
-                a(i) = a(i) - m(j) * (lft + rgt)
+                vsign_j = alpha*cs(j) - beta*(v(i)-v(j))*xsign !sign as in 1D so unit vector is scalar
+                if ( (v(i)-v(j)) * xsign < 0.0 ) then
+                    qab_j = -0.5 * rho(j)*vsign_j * (v(i)-v(j)) * xsign
+                else 
+                    qab_j = 0
+                end if
+                
+                RHS = (pre(j) + qab_j) / rho(j)**2  * sigma/h(j)**2 * w_j * xsign
+                
+                !Combining
+                a(i) = a(i) - m(j) * (LHS + RHS)
                 
             end do
         end do

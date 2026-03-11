@@ -11,4 +11,16 @@ contains
 
         pre(1:n) = rho(1:n) * cs(1:n)**2
     end subroutine iso_eos
+
+    subroutine adiabatic_eos(n, rho, u, pre, cs)
+        !Adiabatic equation of state
+        real, dimension(:), intent(in) :: rho, u
+        real, dimension(:), intent(inout) :: pre, cs
+        integer, intent(in) :: n
+        real, parameter :: gamma = 1
+
+
+        pre(1:n) = (gamma - 1) * rho(1:n) * u(1:n)
+        cs(1:n) = sqrt(gamma * Pre/rho)
+    end subroutine adiabatic_eos 
 end module eos

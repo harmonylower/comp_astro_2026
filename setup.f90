@@ -1,14 +1,14 @@
 module setup
     use eos, only: iso_eos
-    real, parameter :: xmax=1.0, xmin=0.0,  rho0=1.0 !SOMEWHERE ELSE USES
+    real, parameter :: xmax=1.0, xmin=0.0,  rho0=1.0 !SOMEWHERE ELSE USES xmax and xmin
     real, parameter :: hfac = 1.2 ! get_h uses    
     
 contains
-    subroutine init(nmax, x, vel, mass, h, rho, pre, u, cs, n, problem)
+    subroutine init(nmax, x, vel, mass, h, cs, n, problem)
         integer, intent(in) :: nmax
         integer, intent(out) :: n
         real, parameter :: PI=4.0*atan(1.0)
-        real, dimension(nmax), intent(inout) :: x, vel, mass, h, rho, pre, cs, u
+        real, dimension(nmax), intent(inout) :: x, vel, mass, h, cs
         real :: dx
         integer :: i, problem
 
@@ -23,7 +23,6 @@ contains
             vel(i) = 1.0E-4 * cs(i) * sin((2.0*PI)/(xmax-xmin) * (x(i)-xmin)) !ASK DANIEL
             mass(i) = rho0 * dx 
             h(i) = hfac * dx
-            pre(i) = rho0 * cs(i)**2
         end do
 
         case(2) !isothermal shock tube problem

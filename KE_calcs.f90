@@ -11,33 +11,34 @@ module energy_calcs
         entryno = entryno + 1
     end subroutine get_ke
 
-    subroutine write_ke_tot(ke_tot, tmax, dt)
-        real, dimension(:), intent(in) :: ke_tot
-        real, intent(in) :: tmax, dt
+    subroutine write_ke_tot(ke_tot, time_tot)
+        real, dimension(:), intent(in) :: ke_tot, time_tot
         integer :: i, lu
 
         open(lu, file='ke_tot.txt', status='replace', action='write')
         write(lu,*) '# time (s), Total Kinetic Energy'
-        
-        do i = 1, int(tmax/dt)
-            write(lu,*) i*dt, ke_tot(i)
+        i = 1
+        do while (time_tot(i) < maxval(time_tot))
+            write(lu,*) time_tot(i), ke_tot(i)
+            i=i+1
         end do
         close(lu)
     end subroutine write_ke_tot
 
-    subroutine get_period(ke_tot, dt)
-        real, dimension(:), intent(in) :: ke_tot
-        real, intent(in) :: dt
+    subroutine get_period(ke_tot, time_tot)
+        real, dimension(:), intent(in) :: ke_tot, time_tot
         real :: period
         integer :: i, n
 
         n = size(ke_tot)
-        do i=2,n-1
+        i=2
+        do while (time_tot(i) < maxval(time_tot))
             if (ke_tot(i-1) < ke_tot(i) .and. ke_tot(i+1) < ke_tot(i)) then
-                period = 2.0 * i*dt !2*distance between 2 peaks
+                period = 2.0 * time_tot(i) !2*distance between 2 peaks
                 print *, 'Period = ', period, 's'
                 return !only finds distance for first peak
             end if
+            i=i+1
         end do
 
     end subroutine get_period

@@ -12,43 +12,46 @@ program SPH
     real, parameter :: dtout = 0.05, tmax = 5
 
     real, dimension(nmax):: x, v, m, h, rho, u, pre, cs, a
-    real, dimension(int(tmax*1e4)) :: ke_tot
+    real, dimension(int(tmax*1e4)) :: ke_tot, time_tot
     integer :: n, n_ghost, i
-    real :: time, dt, tprint
+    real :: dt, tprint, time
 
-    integer :: problem = 1 !1:1D isothermal linear wave -- 2:isothermal shock tube 
-    integer :: fixes = 0 !0:no fixes -- 1:+variable smoothing length -- 2:+artifical viscosity
+    integer :: problem = 1 !1:1D isothermal linear wave -- 2:isothermal shock tube -- 3:adiabatic eos
+    integer :: fixes = 2 !0:no fixes -- 1:+variable smoothing length -- 2:+artifical viscosity
 
 
 
-    time=0.0
+    time = 0.0
+    i=1
 
     !Inital calcuting and output
     call say()
-    call init(nmax, x, v, m, h, rho, pre, u, cs, n,problem)
+    call init(nmax, x, v, m, h, cs, n, problem)
     call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs)
-    call get_derivs(n, n_ghost, x, m, h, rho, pre, cs, a, v, u)
+    call get_derivs(n, n_ghost, x, m, h, rho, pre, cs, a, v, u, dt, problem,fixes)
 
     call output(time, x, v, a, m, h, rho, u, pre, n)
     
-    dt = 0.25*minval(h(1:n)/cs(1:n)) !ENSURE CHANGE LATER
 
     tprint = dtout
     do while (time < tmax)
-        call step(x, v, a, m, h, rho, pre, cs, dt, n, n_ghost, nmax, u)
+        call step(x, v, a, m, h, rho, pre, cs, dt, n, n_ghost, nmax, u, problem,fixes)
         call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs)
 
         call get_ke(v(1:n), m(1:n), u(1:n), ke_tot)
 
 
         time = time + dt
+        time_tot(i) = time
+        i = i + 1
+
         if (time > tprint) then
             call output(time, x, v, a, m, h, rho, u, pre, n)
             tprint = tprint + dtout
         end if
     end do
-    call write_ke_tot(ke_tot, tmax, dt)
-    call get_period(ke_tot, dt)
+    call write_ke_tot(ke_tot, time_tot)
+    call get_period(ke_tot, time_tot)
 
 end program SPH
 

@@ -22,8 +22,8 @@ contains
 
     end subroutine get_den
 
-    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs)
-        integer, intent(in) :: n, n_ghost
+    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs,fixes)
+        integer, intent(in) :: n, n_ghost, fixes
         real, dimension(:), intent(in) :: x, m, h, rho, pre, v, cs
         real, dimension(:), intent(inout) :: a
 
@@ -33,37 +33,41 @@ contains
 
         a(1:n) = 0.0 
         do i=1, n
-            do j=1, n+n_ghost
-                if (i==j) cycle !skip itself (one less set of calculations)
+        do j=1, n+n_ghost
+            if (i==j) cycle !skip itself (one less set of calculations)
+            
+            dist = abs(x(i)-x(j))
+            xsign = sign(1.0, x(i)-x(j))
 
-                dist = abs(x(i)-x(j))
-                xsign = sign(1.0, x(i)-x(j))
-                !LHS
-                q_i = dist/h(i)
-                call grad_cubic_spline(q_i, w_i)
-                vsign_i = alpha*cs(i) - beta*(v(i)-v(j))*xsign !sign as in 1D so unit vector is scalar
-                if ( (v(i)-v(j))*xsign < 0.0 ) then
-                    qab_i = -0.5 * rho(i)*vsign_i * (v(i)-v(j)) * xsign
-                else 
-                    qab_i = 0
-                end if
-                LHS = (pre(i) + qab_i) / rho(i)**2  * sigma/h(i)**2 * w_i * xsign
+            q_i = dist/h(i)
+            q_j = dist/h(j)
 
-                !RHS
-                q_j = dist/h(j)
-                call grad_cubic_spline(q_j, w_j)
+            call grad_cubic_spline(q_i, w_i)
+            call grad_cubic_spline(q_j, w_j)
+
+            select case (fixes)
+            case (0,1) !no visocisty
+            qab_i = 0
+            qab_j = 0
+            
+            case (2) ! viscosity
+            vsign_i = alpha*cs(i) - beta*(v(i)-v(j))*xsign !sign as in 1D so unit vector is scalar
+            vsign_j = alpha*cs(j) - beta*(v(i)-v(j))*xsign !sign as in 1D so unit vector is scalar
                 
-                vsign_j = alpha*cs(j) - beta*(v(i)-v(j))*xsign !sign as in 1D so unit vector is scalar
-                if ( (v(i)-v(j)) * xsign < 0.0 ) then
-                    qab_j = -0.5 * rho(j)*vsign_j * (v(i)-v(j)) * xsign
-                else 
-                    qab_j = 0
-                end if
+            if ( (v(i)-v(j))*xsign < 0.0 ) then
+                qab_i = -0.5 * rho(i)*vsign_i * (v(i)-v(j)) * xsign
+                qab_j = -0.5 * rho(j)*vsign_j * (v(i)-v(j)) * xsign
+            else 
+                qab_i = 0
+                qab_j = 0
+            end if
+            end select
+
+            LHS = (pre(i) + qab_i) / rho(i)**2  * sigma/h(i)**2 * w_i * xsign
+            RHS = (pre(j) + qab_j) / rho(j)**2  * sigma/h(j)**2 * w_j * xsign
                 
-                RHS = (pre(j) + qab_j) / rho(j)**2  * sigma/h(j)**2 * w_j * xsign
-                
-                !Combining
-                a(i) = a(i) - m(j) * (LHS + RHS)
+            !Combining
+            a(i) = a(i) - m(j) * (LHS + RHS)
                 
             end do
         end do

@@ -1,19 +1,15 @@
 module boundary
-    use setup, only: xmax, xmin
-
 contains
-    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs)
+    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs, dx, xmax, xmin)
         real, dimension(:), intent(inout) :: x, vel, mass, h, rho, u, pre, cs
         integer, intent(in) :: n
         integer, intent(out) :: n_ghosts
-        real :: dx
+        real, intent(in) :: dx, xmax, xmin
         integer :: i
         !PERIODIC BOUNDARY CONDITONS
         !PARTICLES FROM N+1 TO N+N_GHOST ARE GHOST PARTICLES
         
-        dx = xmax-xmin
         n_ghosts = 0
-
         do i=1,n
             !if 2 smothing lengths away is greater than the maximum xvalue 
             !then it must be include in the calculations for the particles with smaller x

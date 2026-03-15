@@ -17,7 +17,7 @@ contains
         real, dimension(:), intent(in) :: rho, u
         real, dimension(:), intent(inout) :: pre, cs
         integer, intent(in) :: n
-        real, parameter :: gamma = 1
+        real, parameter :: gamma = 5.0/3.0 !for ideal gas, for radiation pressure 4/2
 
 
         pre(1:n) = (gamma - 1) * rho(1:n) * u(1:n)

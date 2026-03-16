@@ -42,7 +42,7 @@ contains
             end if
 
         end do
-    case (2) !fixed boundary conditions (shock tube and sod shock)
+    case (2,3) !fixed boundary conditions (shock tube and sod shock)
         nbound = 6
         vel(1:nbound) = 0.0
         vel(n-nbound:n) = 0.0

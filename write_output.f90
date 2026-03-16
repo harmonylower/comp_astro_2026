@@ -17,12 +17,11 @@ contains
         write(filename,"(a,i5.5,a)") 'output_',nfile,'.txt'
         open(newunit=lu, file=filename, status='replace', action='write')
         
-        write(lu,*) '# x, v, a,m, h, density, ke, pressure, sound speed'
+        write(lu,*) '# x, v, a,m, h, density, u, pressure'
         write(lu,*) time
         do i=1,n
             write(lu,*) x(i), v(i), a(i), m(i), h(i), rho(i), u(i), pre(i)
         enddo
-        write(lu,*) sum(u(1:n))
         close(lu)
     end subroutine output
 

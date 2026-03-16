@@ -23,16 +23,17 @@ contains
 
     end subroutine get_den
 
-    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs)
+    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs,du)
         integer, intent(in) :: n, n_ghost
         real, dimension(:), intent(in) :: x, m, h, rho, pre, v, cs
-        real, dimension(:), intent(inout) :: a
+        real, dimension(:), intent(inout) :: a, du
 
         real :: dist, q_i, q_j, w_i, w_j, LHS, RHS, vsign_i, vsign_j, xsign, qab_i, qab_j
         integer :: i, j
         real, parameter :: sigma = 2.0/3.0, alpha = 1.0, beta = 2.0
 
         a(1:n) = 0.0 
+        du(1:n) = 0.0
         do i=1, n
         do j=1, n+n_ghost
             if (i==j) cycle !skip itself (one less set of calculations)
@@ -69,7 +70,7 @@ contains
                 
             !Combining
             a(i) = a(i) - m(j) * (LHS + RHS)
-                
+            du(i) = du(i) + m(j)*LHS*(v(i)-v(j))
             end do
         end do
     end subroutine get_accel

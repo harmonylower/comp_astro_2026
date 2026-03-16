@@ -1,5 +1,5 @@
 module eos
-    implicit none
+    use setup, only:gamma
 contains
     subroutine iso_eos(n, rho, pre, cs)
         !isothermic equation of state
@@ -17,11 +17,18 @@ contains
         real, dimension(:), intent(in) :: rho, u
         real, dimension(:), intent(inout) :: pre, cs
         integer, intent(in) :: n
-        real, parameter :: gamma = 5.0/3.0 !for ideal gas, for radiation pressure 4/2
-
+        integer :: i
+  !for ideal gas gamma=5/3, for radiation pressure 4/2
 
         pre(1:n) = (gamma - 1) * rho(1:n) * u(1:n)
-        cs(1:n) = sqrt(gamma * Pre/rho)
         
+        do i = 1, n
+            if (rho(i) > 0.0 .and. pre(i) > 0.0) then
+                cs(i) = sqrt(gamma * pre(i) / rho(i))
+            else
+                cs(i) = 1.0  ! fallback value to prevent NaN
+            end if
+        end do
+
     end subroutine adiabatic_eos 
 end module eos

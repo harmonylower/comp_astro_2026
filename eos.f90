@@ -22,5 +22,6 @@ contains
 
         pre(1:n) = (gamma - 1) * rho(1:n) * u(1:n)
         cs(1:n) = sqrt(gamma * Pre/rho)
+        
     end subroutine adiabatic_eos 
 end module eos

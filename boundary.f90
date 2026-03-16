@@ -1,8 +1,8 @@
 module boundary
 contains
-    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs, dx, xmax, xmin)
+    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs, dx, xmax, xmin,problem)
         real, dimension(:), intent(inout) :: x, vel, mass, h, rho, u, pre, cs
-        integer, intent(in) :: n
+        integer, intent(in) :: n, problem
         integer, intent(out) :: n_ghosts
         real, intent(in) :: dx, xmax, xmin
         integer :: i
@@ -10,6 +10,9 @@ contains
         !PARTICLES FROM N+1 TO N+N_GHOST ARE GHOST PARTICLES
         
         n_ghosts = 0
+
+        select case (problem)
+        case (1) !isothermal linear sine wave
         do i=1,n
             !if 2 smothing lengths away is greater than the maximum xvalue 
             !then it must be include in the calculations for the particles with smaller x
@@ -38,6 +41,11 @@ contains
             end if
 
         end do
+    case (2) !fixed boundary conditions (shock tube and sod shock)
+        nbound = 6
+        vel(1:nbound) = 0.0
+        vel(n-nbound:n) = 0.0
+    end select
     end subroutine set_ghosts
 end module boundary
 

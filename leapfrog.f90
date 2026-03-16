@@ -16,17 +16,17 @@ contains
         
         select case (fixes)
         case (0)
-            call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost, cs, dx, xmax, xmin) 
+            call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost, cs, dx, xmax, xmin,problem) 
             call get_den(n, n_ghost, x, m, h, rho)
         case (1,2)
         do i=1, 3
-            call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs, dx, xmax,xmin) 
+            call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs, dx, xmax,xmin,problem) 
             call get_den(n, n_ghost, x, m, h, rho)
             call get_h(m, rho, n, h)
         end do
         end select
         
-        call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs, dx, xmax,xmin) !remove once work out what initial pressure should be
+        call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs, dx, xmax,xmin,problem) !remove once work out what initial pressure should be
         
         select case (problem)
         case (1, 2) !isothermal 1d linear wave
@@ -36,7 +36,7 @@ contains
         end select
 
     
-        call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs, dx, xmax, xmin) !remove once work out what initial pressure should be
+        call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs, dx, xmax, xmin,problem) !remove once work out what initial pressure should be
         call get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs, fixes)
     
         dt_new = 0.25*minval(h(1:n)/cs(1:n)) 

@@ -1,6 +1,6 @@
 program SPH
     use hello, only:say
-    use setup, only:init_iso_wave, init_shock_tube
+    use setup, only:init_iso_wave, init_shock_tube, init_choice, fix_choice, eos_choice
     use write_output, only:output
     use calcs, only:get_den
     use boundary, only:set_ghosts
@@ -16,9 +16,7 @@ program SPH
     integer :: n, n_ghost, i
     real :: dt, tprint, time, xmax, xmin, dx
 
-    integer :: problem = 2 !1:1D isothermal linear wave -- 2:isothermal shock tube -- 3:adiabatic eos
-    integer :: fixes = 2!0:no fixes -- 1:+variable smoothing length -- 2:+artifical viscosity
-
+    
 
 
     time = 0.0
@@ -26,7 +24,7 @@ program SPH
 
     !Inital calcuting and output
     call say()
-    select case (problem)
+    select case (init_choice)
     case (1) !isothermal linear wave
         xmax = 1.0
         xmin = 0.0
@@ -38,15 +36,15 @@ program SPH
     end select
     dx = xmax-xmin
 
-    call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost, cs, dx, xmax,xmin,problem)
-    call get_derivs(n, n_ghost, x, m, h, rho, pre, cs, a, v, u, dt, problem,fixes, dx,xmax,xmin)
-    call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost, cs, dx, xmax,xmin,problem)
+    call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost, cs, dx, xmax,xmin)
+    call get_derivs(n, n_ghost, x, m, h, rho, pre, cs, a, v, u, dt,dx,xmax,xmin)
+    call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost, cs, dx, xmax,xmin)
 
     call output(time, x, v, a, m, h, rho, u, pre, n)
     tprint = dtout
     do while (time < tmax)
-        call step(x, v, a, m, h, rho, pre, cs, dt, n, n_ghost, nmax, u, problem,fixes,dx,xmax,xmin)
-        call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs,dx,xmax,xmin,problem)
+        call step(x, v, a, m, h, rho, pre, cs, dt, n, n_ghost, nmax, u,dx,xmax,xmin)
+        call set_ghosts(n, x, v, m, h, rho, u, pre, n_ghost,cs,dx,xmax,xmin)
 
         call get_ke(v(1:n), m(1:n), u(1:n), ke_tot)
 

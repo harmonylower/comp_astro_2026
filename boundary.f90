@@ -1,8 +1,9 @@
 module boundary
+use setup, only: init_choice
 contains
-    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs, dx, xmax, xmin,problem)
+    subroutine set_ghosts(n, x, vel, mass, h, rho, u, pre, n_ghosts, cs, dx, xmax, xmin)
         real, dimension(:), intent(inout) :: x, vel, mass, h, rho, u, pre, cs
-        integer, intent(in) :: n, problem
+        integer, intent(in) :: n
         integer, intent(out) :: n_ghosts
         real, intent(in) :: dx, xmax, xmin
         integer :: i
@@ -11,7 +12,7 @@ contains
         
         n_ghosts = 0
 
-        select case (problem)
+        select case (init_choice)
         case (1) !isothermal linear sine wave
         do i=1,n
             !if 2 smothing lengths away is greater than the maximum xvalue 

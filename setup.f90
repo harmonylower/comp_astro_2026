@@ -1,7 +1,11 @@
 module setup
     use eos, only: iso_eos
     !SOMEWHERE ELSE USES xmax and xmin
-    real, parameter :: hfac = 1.2 ! get_h uses    
+    real, parameter :: hfac = 1.2 ! get_h uses 
+    integer :: init_choice = 2 !1:1D isothermal linear wave -- 2:shock tube -- 3:sod shock
+    integer :: eos_choice = 1 !1:isothermic 2:adiabaitc
+    integer :: fix_choice = 2!0:no fixes -- 1:+variable smoothing length -- 2:+artifical viscosity
+   
     
 contains
     subroutine init_iso_wave(nmax, xmax, xmin, x, vel, mass, h, cs, n)

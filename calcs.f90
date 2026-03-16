@@ -1,5 +1,6 @@
 module calcs
     use kernal, only:cubic_spline, grad_cubic_spline
+    use setup, only: fix_choice
     implicit none
 contains
     subroutine get_den(n, n_ghost, x, m, h, rho)
@@ -22,8 +23,8 @@ contains
 
     end subroutine get_den
 
-    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs,fixes)
-        integer, intent(in) :: n, n_ghost, fixes
+    subroutine get_accel(n, n_ghost, x, v, m, h, rho, pre, a, cs)
+        integer, intent(in) :: n, n_ghost
         real, dimension(:), intent(in) :: x, m, h, rho, pre, v, cs
         real, dimension(:), intent(inout) :: a
 
@@ -45,7 +46,7 @@ contains
             call grad_cubic_spline(q_i, w_i)
             call grad_cubic_spline(q_j, w_j)
 
-            select case (fixes)
+            select case (fix_choice)
             case (0,1) !no visocisty
             qab_i = 0
             qab_j = 0

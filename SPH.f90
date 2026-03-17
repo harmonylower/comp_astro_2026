@@ -1,6 +1,6 @@
 program SPH
     use hello, only:say
-    use setup, only:init_iso_wave, init_sod_shock,init_shock_tube, init_choice, fix_choice, eos_choice
+    use setup, only:init_iso_wave, init_sod_shock,init_shock_tube, init_choice
     use write_output, only:output
     use calcs, only:get_den
     use boundary, only:set_ghosts
@@ -9,7 +9,7 @@ program SPH
 
     implicit none
     integer, parameter :: nmax=1000
-    real, parameter :: dtout = 0.005, tmax = 0.2
+    real, parameter :: dtout = 0.001, tmax = 0.2
 
     real, dimension(nmax):: x, v, m, h, rho, u, pre, cs, a,du, ke
     real, dimension(int(tmax*1e4)) :: ke_tot, time_tot

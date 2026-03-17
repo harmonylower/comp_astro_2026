@@ -6,7 +6,6 @@ module energy_calcs
         real, dimension(:), intent(in) :: v, m
         real, dimension (:), intent(inout) :: ke, ke_tot
         ke = 0.5 * m * v**2
-       
         ke_tot(entryno) = sum(ke)
         entryno = entryno + 1
     end subroutine get_ke
@@ -14,7 +13,7 @@ module energy_calcs
     subroutine write_ke_tot(ke_tot, time_tot)
         real, dimension(:), intent(in) :: ke_tot, time_tot
         integer :: i, lu
-
+        lu=10
         open(lu, file='ke_tot.txt', status='replace', action='write')
         write(lu,*) '# time (s), Total Kinetic Energy'
         i = 1

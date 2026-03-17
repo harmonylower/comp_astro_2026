@@ -1,6 +1,6 @@
 module setup
     real, parameter :: hfac = 1.2, gamma=1.4 ! get_h uses 
-    integer :: init_choice = 3 !1:1D isothermal linear wave -- 2:shock tube -- 3:sod shock
+    integer :: init_choice = 3 !1:1D isothermal linear wave -- 2:shock tube -- 3:sod shock (also sets boundary condition)
     integer :: eos_choice = 2 !1:isothermic 2:adiabaitc
     integer :: fix_choice = 2!0:no fixes -- 1:+variable smoothing length -- 2:+artifical viscosity
    

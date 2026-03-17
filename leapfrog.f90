@@ -13,7 +13,7 @@ contains
         real, dimension(:), intent(inout) :: rho, pre, cs, a, v
         real, intent(out) :: dt_new
         real, intent(in) :: dx, xmax, xmin
-        integer :: i, icall = 0
+        integer :: i
         
         select case (fix_choice)
         case (0)
